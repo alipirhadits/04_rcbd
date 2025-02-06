@@ -334,18 +334,40 @@ ggsave("../Output/rcbd_means.png",
        width = 6)
 ```
 K rates inside N
+```{r}
+rcbd_means_all <- emmeans(rcbd_mod, ~nrate_kgha | krate_kgha)
+                  # emmeans(rcbd_mod, ~nrate_kgha | krate_kgha)
+
+rcbd_means_all
+```
+```{r}
+rcbd_cld_all <- cld(rcbd_means_all, 
+                   reversed=T, 
+                   adjust="none",
+               Letters=letters)
+
+rcbd_cld_all
+```
+```{r}
+rcbd_cld_selected <- rcbd_cld_all %>%
+  as.data.frame() %>%
+  mutate(letter = trimws(.group)) %>%
+  mutate(trtname = paste0(nrate_kgha, "+", krate_kgha))
+
+rcbd_cld_selected
+```
 
 ```{r}
 ggplot() + 
   geom_boxplot(data = rcbd_dfw,
-               aes(x = trtname, y = yield_kgha,
+               aes(x = krate_kgha, y = yield_kgha,
                    fill = trtname))+
   geom_jitter(data = rcbd_dfw,
-              aes(x = trtname, y = yield_kgha,
+              aes(x = krate_kgha, y = yield_kgha,
                   colour = trtname),
               alpha = 0.6)+
   geom_label(data = rcbd_cld_selected,
-            aes(x = trtname, y = emmean,
+            aes(x = krate_kgha, y = emmean,
                 label = letter),
             size = 3,
             label.padding = unit(0.1, "lines")) +
@@ -353,8 +375,11 @@ ggplot() +
        y = "Yield (kgha)") +
   scale_fill_viridis_d() +
   scale_color_viridis_d() +
-  facet_grid(.~ntate.kgha)
+  facet_grid(.~nrate_kgha) +
   theme(legend.position = "none") # برای حذف کردن لنجد استفاده شد
+ggsave("../Output/rcbd_means_Krates_inside_N.png",
+       height = 4,
+       width = 6)
 ```
 ```
 
